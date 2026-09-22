@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabaseBrowser';
+import { useEffect, useState } from 'react';
 
 interface WinnerRecord {
   id: string;
@@ -16,13 +16,8 @@ interface WinnerRecord {
 export default function AdminDashboard() {
   const supabase = createClient();
 
-  const [drawType, setDrawType] = useState<'random' | 'algorithmic'>(
-    'random'
-  );
-
-  const [simulationResult, setSimulationResult] = useState<number[] | null>(
-    null
-  );
+  const [drawType, setDrawType] = useState<'random' | 'algorithmic'>('random');
+  const [simulationResult, setSimulationResult] = useState<number[] | null>(null);
 
   const [winners, setWinners] = useState<WinnerRecord[]>([]);
   const [loadingWinners, setLoadingWinners] = useState(true);
@@ -67,11 +62,6 @@ export default function AdminDashboard() {
         .select('role')
         .eq('id', user.id)
         .single();
-
-      console.log('Logged in user:', user.email);
-      console.log('Profile:', profile);
-      console.log('Profile error:', error);
-      console.log('Role:', profile?.role);
 
       if (error || !profile) {
         setUserRole(null);
@@ -131,12 +121,10 @@ export default function AdminDashboard() {
   return (
     <div className="bg-slate-900 min-h-screen text-slate-100 py-10 px-4">
       <div className="max-w-6xl mx-auto space-y-8">
-
         <div className="border-b border-slate-800 pb-4">
           <h1 className="text-3xl font-extrabold text-amber-400">
             Administrator Control Center
           </h1>
-
           <p className="text-slate-400 text-sm mt-1">
             Manage draws, user verification, and platform analytics.
           </p>
@@ -149,7 +137,6 @@ export default function AdminDashboard() {
           </h2>
 
           <div className="flex flex-col md:flex-row gap-6">
-
             <div className="space-y-2 flex-1">
               <label className="text-sm font-semibold text-slate-400">
                 Select Draw Mode
@@ -164,10 +151,7 @@ export default function AdminDashboard() {
                 }
                 className="w-full bg-slate-900 border border-slate-700 rounded-md p-2 text-white"
               >
-                <option value="random">
-                  Standard Random Selection
-                </option>
-
+                <option value="random">Standard Random Selection</option>
                 <option value="algorithmic">
                   Algorithmic Weighted by Score Frequency
                 </option>
@@ -177,7 +161,7 @@ export default function AdminDashboard() {
             <div className="flex items-end gap-3">
               <button
                 onClick={runDrawSimulation}
-                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2 rounded-md transition"
+                className="w-full md:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2 rounded-md transition"
               >
                 Run Simulation
               </button>
@@ -190,7 +174,7 @@ export default function AdminDashboard() {
                 Simulated Winning Numbers:
               </p>
 
-              <div className="flex gap-4 mt-2">
+              <div className="flex flex-wrap gap-3 mt-2">
                 {simulationResult.map((n, i) => (
                   <span
                     key={i}
@@ -206,31 +190,26 @@ export default function AdminDashboard() {
 
         {/* Dynamic Winner Verification Table */}
         <div className="bg-slate-950 border border-slate-800 p-6 rounded-xl space-y-4">
-
           <h2 className="text-xl font-bold text-white">
             Winner Verification & Payout Queue
           </h2>
 
-          <div className="border border-slate-800 rounded-lg overflow-hidden">
-
-            <table className="w-full text-left text-sm text-slate-400">
-
+          {/* Responsive Table Wrapper */}
+          <div className="border border-slate-800 rounded-lg overflow-x-auto">
+            <table className="w-full min-w-150 text-left text-sm text-slate-400">
               <thead className="bg-slate-900 text-slate-300 uppercase text-xs">
                 <tr>
-                  <th className="p-3">User</th>
-                  <th className="p-3">Match Tier</th>
-                  <th className="p-3">Prize</th>
-                  <th className="p-3">Proof Submission</th>
-
-                  {/* Only show Action column for admin */}
+                  <th className="p-3 whitespace-nowrap">User</th>
+                  <th className="p-3 whitespace-nowrap">Match Tier</th>
+                  <th className="p-3 whitespace-nowrap">Prize</th>
+                  <th className="p-3 whitespace-nowrap">Proof Submission</th>
                   {userRole === 'admin' && (
-                    <th className="p-3">Action</th>
+                    <th className="p-3 whitespace-nowrap">Action</th>
                   )}
                 </tr>
               </thead>
 
               <tbody>
-
                 {loadingWinners ? (
                   <tr>
                     <td
@@ -255,38 +234,32 @@ export default function AdminDashboard() {
                       key={w.id}
                       className="border-t border-slate-800"
                     >
-
-                      <td className="p-3 text-white">
-                        {w.profiles?.email ||
-                          'vedant@digitalheroes.com'}
+                      <td className="p-3 text-white whitespace-nowrap">
+                        {w.profiles?.email || 'vedant@digitalheroes.com'}
                       </td>
 
-                      <td className="p-3 capitalize">
+                      <td className="p-3 capitalize whitespace-nowrap">
                         {w.match_category.replace('_', ' ')}
                       </td>
 
-                      <td className="p-3 text-emerald-400 font-bold">
+                      <td className="p-3 text-emerald-400 font-bold whitespace-nowrap">
                         ${w.prize_amount}
                       </td>
 
-                      <td className="p-3 text-amber-400 font-semibold">
+                      <td className="p-3 text-amber-400 font-semibold max-w-xs truncate">
                         {w.proof_url}
                       </td>
 
-                      {/* ADMIN ONLY */}
                       {userRole === 'admin' && (
-                        <td className="p-3">
+                        <td className="p-3 whitespace-nowrap">
                           <button
-                            onClick={() =>
-                              handleApprovePayout(w.id)
-                            }
+                            onClick={() => handleApprovePayout(w.id)}
                             disabled={
-                              w.status === 'paid' ||
-                              updatingId === w.id
+                              w.status === 'paid' || updatingId === w.id
                             }
                             className={`px-3 py-1.5 rounded text-xs font-bold transition ${w.status === 'paid'
-                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-default'
-                                : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
+                              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-default'
+                              : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
                               }`}
                           >
                             {updatingId === w.id
@@ -297,11 +270,9 @@ export default function AdminDashboard() {
                           </button>
                         </td>
                       )}
-
                     </tr>
                   ))
                 )}
-
               </tbody>
             </table>
           </div>
